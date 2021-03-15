@@ -11,6 +11,7 @@ github地址：https://github.com/elastic/elasticsearch-py
 
 使用数据：Enterprise-Registration-Data
 
+中文分词器：https://github.com/medcl/elasticsearch-analysis-ik
 
 # 设计以相关性为核心的搜索
 三个步骤：收集信息和需求，设计搜索应用，部署监控改进
@@ -30,3 +31,21 @@ github地址：https://github.com/elastic/elasticsearch-py
    - 注册时间区间筛选
    - 经营类型搜索匹配
    - 城市和省会搜索
+## 设计搜索应用
+两个目标：1功能，2体验
+### 定义字段和模型的信号
+对字段定义需要通过迭代的方式完成。
+以分类的方式来思考字段，可以简化迭代过程。
+书中把示例的字段分为：位置，偏好，内容和业务。这个实践只需要考虑：位置，时间和内容。
+
+| 字段名              | 信息         | 分析              |
+| ------------------- | ------------ | ----------------- |
+| name                | 公司名，全称 | ik_max_word分词 |
+| code                | 代码         | 不分词            |
+| registrationDay     | 注册时间     | date格式          |
+| legalRepresentative | 法人代表     | ik_max_word分词   |
+| businessScope       | 经营范围     | ik_max_word分词   |
+| province            | 省份         | 不分词            |
+| city                | 城市         | 不分词            |
+| address             | 地址         | ik_max_word分词   |
+
