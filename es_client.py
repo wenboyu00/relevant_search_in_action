@@ -44,8 +44,7 @@ class EsClient:
         result = self.helpers.bulk(self.es, docs)
         return result
 
-    def search(self, index, body):
-        return self.es.search(index=index, body=body)
-
-
-
+    def search(self, index, body, timeout=3, debug=False):
+        if debug:
+            return self.es.search(index=index, body=body, request_timeout=timeout, explain=True)
+        return self.es.search(index=index, body=body, request_timeout=timeout)

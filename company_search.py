@@ -37,7 +37,7 @@ class CompanySearch:
         companies_info = get_companies_info()
         self.es.update("company", companies_info, 'code')
 
-    def search_company(self, keyword=None, start_date=None, end_date=None, query_filed=None):
+    def search_company(self, keyword=None, start_date=None, end_date=None, province=None, city=None, query_filed=None):
         """
 
         :param keyword: 搜索关键字
@@ -49,6 +49,8 @@ class CompanySearch:
             - keyword_query_cross_fields：把目标字段作为同一个字段进行匹配
         :param start_date: 注册时间筛选开始时间，大于等于
         :param end_date: 注册时间筛选结束时间，小于等于
+        :param province: 省份匹配
+        :param city: 城市匹配
         :param query_filed: 搜索后返回字段
         :return:result_list:搜索结果列表
         """
@@ -59,6 +61,13 @@ class CompanySearch:
         if start_date and end_date:
             date_range = {"range": {"registrationDay": {"gte": start_date, "lte": end_date}}}
             filter_list.append(date_range)
+        if province:
+            province_term = {"term": {"province": province}}
+            filter_list.append(province_term)
+        if city:
+            city_term = {"term": {"city": city}}
+            filter_list.append(city_term)
+
         # 关键字搜索
         if not keyword:
             keyword_query = {"match_all": {}}
@@ -79,8 +88,8 @@ class CompanySearch:
             "query": {
                 "bool": {
                     "should": [keyword_query, keyword_query_cross_fields],
-                    "filter": filter_list
-                }
+                    "filter": filter_list,
+                },
             }
 
         }
@@ -95,7 +104,8 @@ class CompanySearch:
             for k in query_filed:
                 result_dict[k] = hit.get('_source').get(k, None)
             result_list.append(result_dict)
-        return result_list
+        result_total = response.get('hits').get('total')
+        return result_list, result_total
 
 
 if __name__ == '__main__':
@@ -105,7 +115,7 @@ if __name__ == '__main__':
     # cs.insert_companies_info()
     company_need_filed = ["name", "code", "registrationDay", "legalRepresentative", "businessScope",
                           "province", "city", "address"]
-    result = cs.search_company(keyword="雅丽", start_date="1999-01-01", end_date="1999-12-31",
-                               query_filed=company_need_filed)
+    result, total = cs.search_company(keyword="工程", start_date="1999-01-01", end_date="1999-12-31",
+                                      query_filed=company_need_filed)
     for r in result:
         print(r)
