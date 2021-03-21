@@ -45,7 +45,7 @@ class EsClient:
         return result
 
     def search(self, index, body):
-        return self.es.search(index=index, body=body, timeout=3)
+        return self.es.search(index=index, body=body)
 
 
 
